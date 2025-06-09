@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl", "linux-musl-openssl-3.0.x"]
+}
+
+// Run yarn db:gen to generate entites/dto
+generator nestjsDto {
+  provider                        = "prisma-generator-nestjs-dto"
+  output                          = "../src/types-generated/"
+  outputToNestJsResourceStructure = "true"
+  outputApiPropertyType           = "true"
+  dtoSuffix                       = "Input"
+  classValidation                 = "true"
+  prettier                        = "true"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  fullName     String   @map("full_name")
+  phone        String?  @unique
+  email        String   @unique
+  isAdmin      Boolean? @map("is_admin")
+  /// @DtoEntityHidden
+  password     String
+  /// @DtoApiHidden
+  refreshToken String?  @map("refresh_token")
+}
